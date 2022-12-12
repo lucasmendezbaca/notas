@@ -1,0 +1,134 @@
+body {
+    margin: 0px;
+    background-color: #222222;
+    color: white;
+}
+
+.container {
+    padding: 30px 50px;
+}
+
+#tarea_input {
+    width: calc(100% - 56px);
+    border-radius: 12px;
+    border-style: none;
+    height: 66px;
+    font-size: 20px;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+
+.tareas {
+    border-radius: 12px;
+    border: 1px solid white;
+    border-style: inset;
+    overflow: hidden;
+}
+
+.tarea {
+    padding: 14px 28px;
+    background-color: #303030;
+    border-bottom: 1px solid white;
+}
+
+.tarea:last-child {
+    border-bottom: none;
+}
+
+.tarea__info {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #303030;
+    border: 3px solid white;
+}
+
+.checked {
+    border: 3px solid #66bb6a;
+    background-image: url("img/check.svg");
+}
+
+.num_tareas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.num_tareas__info {
+    border-right: 1px solid white;
+    padding-right: 10px;
+}
+
+.num_tareas p{
+    display: flex;
+    align-items: center;
+}
+
+.num_tareas img {
+    max-width: 14px;
+    margin-right: 4px;
+}
+
+.num_tareas__info img {
+    max-width: 20px;
+}
+
+#borrarTareas {
+    color: #f39c12;
+}
+
+.tarea__info__nombre {
+    flex-grow: 1;
+    margin-left: 20px;
+    font-size: 22px;
+}
+
+.tarea__info__nombre--checked {
+    text-decoration: line-through;
+    color: #66bb6a;
+}
+
+.tarea__borrar {
+    border-radius: 4px;
+    padding: 6px 6px;
+    background-color: #e74c3c;
+    border-style: none;
+}
+
+.tarea__borrar__icono {
+    border-radius: 50%;
+    padding: 3px;
+    width: 24px;
+    height: 24px;
+    background-color: white;
+}
+
+.tarea__prioridad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 50%;
+}
+
+.low img,
+.high img {
+    margin-bottom: -8px;
+}
+
+.tarea__prioridad p {
+    font-size: 12px;
+    color: #999999;
+    margin: 0px;
+}
+
+.tarea__prioridad span {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: #464545;
+}

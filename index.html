@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de tareas - Lucas</h1>
+        <input type="text" name="tarea_input" id="tarea_input" placeholder="¿Qué quieres recordar?">
+
+        <hr>
+        <div class="num_tareas">
+            <p class="num_tareas__info"><img src="img/line-chart.svg" alt=""><span id="numTareasPendientes">0</span>&nbsp;tareas pendientes de un total de&nbsp;<span id="numTareas">0</span></p>  <p id="borrarTareas"><img src="img/close.svg" alt="">Borrar tareas completadas</p>
+        </div>
+        <hr>
+
+        <section id="tareas" class="tareas">
+            <!-- <div class="tarea">
+                <div class="tarea__info">
+                    <div class="check"></div>
+                    <p class="tarea__info__nombre">Estudiar</p>
+                    <button class="tarea__borrar"><div class="tarea__borrar__icono"><img src="img/trash.svg" alt=""></div></button>
+                </div>
+                <div class="tarea__prioridad">
+                    <p>Prioridad:</p> <p><span class="low"><img src="img/chevron-down.svg">Low</span> <span class="normal">Normal</span> <span class="high">High<img src="img/chevron-up.svg"></span></p> <p class="tarea__temporizador">Añadido hace 6 minutes ago</p>
+                </div>
+            </div> -->
+        </section>
+
+    </div>
+    
+    <script type="module" src="index.js"></script>
+</body>
+</html>
