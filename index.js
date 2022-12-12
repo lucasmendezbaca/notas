@@ -126,6 +126,8 @@ function mostrarNota(nota) {
         </div>
     `;
 
+    $('.tarea').last().hide().slideDown(500);
+
     marcaChecks();
     borrarTarea();
     marcarPrioridad();
