@@ -8,7 +8,7 @@ const numTareasPendientes = document.getElementById('numTareasPendientes');
 const colorPrioridades = {low: 'green', normal: 'orange', high: 'red'}
 
 window.onload = () => {
-    Tarea.tareas = JSON.parse(localStorage.getItem('tareas')) ? JSON.parse(localStorage.getItem('tareas')) : [];
+    Tarea.tareas = JSON.parse(localStorage.getItem('tareas')) || [];
     numTareas.textContent = Tarea.numTareas();
     numTareasPendientes.textContent = Tarea.numTareasPendientes();
     cargarTareas();
