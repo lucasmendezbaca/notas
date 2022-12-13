@@ -1,136 +1,138 @@
-import { Nota } from './nota.js'
+import { Tarea } from './Tarea.js'
 
 const tareaInput = document.getElementById('tarea_input');
+const tareaContainer = document.getElementById('tareas');
 const borrarTareas = document.getElementById('borrarTareas');
-const notasContainer = document.getElementById('tareas');
 const numTareas = document.getElementById('numTareas');
 const numTareasPendientes = document.getElementById('numTareasPendientes');
-const colorPrioridad = {"low": "blue", "normal": "orange", "high": "red"};
+const colorPrioridades = {low: 'green', normal: 'orange', high: 'red'}
 
-function mostrarNotas() {
-    let notas = Nota.obtenerPorPrioridad();
+window.onload = () => {
+    Tarea.tareas = JSON.parse(localStorage.getItem('tareas')) ? JSON.parse(localStorage.getItem('tareas')) : [];
+    numTareas.textContent = Tarea.numTareas();
+    numTareasPendientes.textContent = Tarea.numTareasPendientes();
+    cargarTareas();
+}
 
-    notas.forEach(nota => {
-        mostrarNota(nota);
+tareaInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        let tarea = new Tarea(tareaInput.value);
+        tarea.guardar();
+        mostrarTarea(tarea);
+            
+
+        actualizarNumTareas();
+        actualizarTareasPendientes();
+
+        tareaInput.value = '';
+    }
+});
+
+function actualizarMinutosTareas() {
+    tareaContainer.querySelectorAll('.tarea').forEach(tareaElement => {
+        let titulo = tareaElement.querySelector('.tarea__info__nombre').textContent;
+        tareaElement.querySelector('.tarea__temporizador').textContent = `Añadido hace ${Tarea.getTiempo(titulo)} minutes ago`;
     });
 }
 
-function actualizarTareasContador() {
-    numTareas.textContent = Nota.numeroNotas();
-    numTareasPendientes.textContent = Nota.numeroNotasPendientes();
-}
 
-function marcaChecks() {
-    const cheks = document.querySelectorAll('.check');
-    cheks.forEach(check => {
-        check.addEventListener('click', function() {
-            check.classList.toggle('checked');
+borrarTareas.addEventListener('click', () => {
+    Tarea.borrarCompletadas();
+    tareaContainer.querySelectorAll('.tarea').forEach(tareaElement => {
+        if (tareaElement.querySelector('.check').classList.contains('checked')) {
+            tareaElement.remove();
+            actualizarNumTareas();
+            actualizarTareasPendientes();
+        }
+    });
+});
 
-            let titulo = check.nextElementSibling;
-            titulo.classList.toggle('tarea__info__nombre--checked');
-
-            let estado = check.classList.contains('checked') ? 'completada' : 'pendiente';
-            Nota.actualizarEstado(titulo.textContent, estado);
-            actualizarTareasContador();
-        });
+function habilitarBorrado(tarea, tareaElement) {
+    tareaElement.querySelector('.tarea__borrar').addEventListener('click', () => {
+        tareaElement.remove();
+        Tarea.borrarTarea(tarea.titulo);
+        actualizarNumTareas();
+        actualizarTareasPendientes();
     });
 }
 
-function marcarPrioridad() {
-    const divPrioridades = document.querySelectorAll('.tarea__prioridad');
-    divPrioridades.forEach(div => {
-        let titulo = div.previousElementSibling.childElementCount === 2 ? div.previousElementSibling.firstElementChild.textContent : div.previousElementSibling.textContent;
-        titulo = titulo.trim();
-        let prioridad = Nota.getPrioridad(titulo);
-        let prioridades = div.getElementsByClassName('prioridad');
-        for (let i = 0; i < prioridades.length; i++) {
-            if (prioridades[i].classList.contains(prioridad)) {
-                prioridades[i].style.color = 'white';
-                prioridades[i].style.backgroundColor = colorPrioridad[prioridad];
-            }
+function habilitarCambioEstado(tarea, tareaElement) {
+    tareaElement.querySelector('.check').addEventListener('click', () => {
+        tareaElement.querySelector('.check').classList.toggle('checked');
+        tareaElement.querySelector('.tarea__info__nombre').classList.toggle('tarea__info__nombre--checked');
+        let tareaLocalStorage = Tarea.obtenerPorTitulo(tarea.titulo);
+        let nuevoEstado = tareaLocalStorage.estado === 'pendiente' ? 'completada' : 'pendiente';
+        Tarea.actualizarEstadoTarea(tarea.titulo, nuevoEstado);
+        actualizarTareasPendientes();
+    });
+}
 
-            prioridades[i].addEventListener('click', function() {
-                let prioridad = this.classList[1];
-                Nota.actualizarPrioridad(titulo, prioridad);
-                for (let j = 0; j < prioridades.length; j++) {
-                    prioridades[j].style.color = '#999999';
-                    prioridades[j].style.backgroundColor = '#464545';
-                }
-                this.style.color = 'white';
-                this.style.backgroundColor = colorPrioridad[prioridad];
+function actualizarNumTareas() {
+    numTareas.textContent = Tarea.numTareas();
+}
 
-                notasContainer.innerHTML = '';
-                mostrarNotas();
-            });
+function actualizarTareasPendientes() {
+    numTareasPendientes.textContent = Tarea.numTareasPendientes();
+}
+
+function mostrarTarea(tarea) {
+    let tareaElement = document.createElement('div');
+    tareaElement.classList.add('tarea');
+    tareaElement.innerHTML = `
+            <div class="tarea__info">
+                <div class="check ${tarea.estado === 'completada' ? 'checked' : ''}"></div>
+                <p class="tarea__info__nombre ${tarea.estado === 'completada' ? 'tarea__info__nombre--checked' : ''}">${tarea.titulo}</p>
+                <button class="tarea__borrar"><div class="tarea__borrar__icono"><img src="img/trash.svg" alt=""></div></button>
+            </div>
+            <div class="tarea__prioridad">
+                <p>Prioridad:</p> <p><span class="prioridad low"><img src="img/chevron-down.svg">Low</span> <span class="prioridad normal">Normal</span> <span class="prioridad high">High<img src="img/chevron-up.svg"></span></p> <p class="tarea__temporizador">Añadido hace 0 minutes ago</p>
+            </div>
+    `;
+
+    tareaContainer.appendChild(tareaElement);
+
+    let prioridades = tareaElement.querySelectorAll('.prioridad');
+    mostrarPrioridad(tarea, prioridades);
+
+    habilitarBorrado(tarea, tareaElement);
+    habilitarCambioEstado(tarea, tareaElement); 
+    habilitarCambioPrioridad(tarea, prioridades);
+    setInterval(() => {
+        actualizarMinutosTareas();
+    }, 1000);
+}
+
+function mostrarPrioridad(tarea, prioridades) {
+    prioridades.forEach(prioridad => {
+        if(prioridad.classList.contains(tarea.prioridad)) {
+            prioridad.style.backgroundColor = colorPrioridades[tarea.prioridad];
+            prioridad.style.color = 'white';
+        } else {
+            prioridad.style.backgroundColor = '#464545';
+            prioridad.style.color = '#999999';
         }
     });
 }
 
-function actualizarTiempo() {
-    const divPrioridades = document.querySelectorAll('.tarea__prioridad');
-    divPrioridades.forEach(div => {
-        let titulo = div.previousElementSibling.childElementCount === 2 ? div.previousElementSibling.firstElementChild.textContent : div.previousElementSibling.textContent;
-        titulo = titulo.trim();
-        let tiempo = Nota.getTiempo(titulo);
-        let temporizador = div.getElementsByClassName('tarea__temporizador')[0];
-        temporizador.textContent = 'Añadido hace ' + tiempo + ' minutes ago';
-    });
-}
-
-
-function borrarTarea() {
-    const borrarTarea = document.querySelectorAll('.tarea__borrar');
-    borrarTarea.forEach(borrar => {
-        borrar.addEventListener('click', function() {
-            let titulo = borrar.previousElementSibling.textContent;
-            Nota.eliminar(titulo);
-            borrar.parentElement.parentElement.remove();
-            actualizarTareasContador();
+function habilitarCambioPrioridad(tarea, prioridades) {
+    prioridades.forEach(prioridad => {
+        prioridad.addEventListener('click', () => {
+            let nuevaPrioridad = prioridad.classList[1];
+            Tarea.actualizarPrioridadTarea(tarea.titulo ,nuevaPrioridad);
+            let tareaActualizada = Tarea.obtenerPorTitulo(tarea.titulo);
+            mostrarPrioridad(tareaActualizada, prioridades);
+            tareaContainer.innerHTML = '';
+            cargarTareas();
         });
     });
 }
 
-borrarTareas.addEventListener('click', function() {
-    Nota.eliminarCompletadas();
-    notasContainer.innerHTML = '';
-
-    mostrarNotas();
-    actualizarTareasContador();
-});
-
-// añadir al nota al local storage
-tareaInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        let titulo = tareaInput.value;
-
-        let nota = new Nota(titulo);
-        nota.guardar();
-
-        tareaInput.value = '';
-        mostrarNota(nota);
-        actualizarTareasContador();
+function cargarTareas() {
+    Tarea.ordenarPorPrioridad();
+    let tareas = JSON.parse(localStorage.getItem('tareas'));
+    if (tareas) {
+        tareas.forEach(tarea => {
+            mostrarTarea(tarea);
+        });
     }
-});
-
-function mostrarNota(nota) {
-    notasContainer.innerHTML += `
-        <div class="tarea">
-            <div class="tarea__info">
-                <div class="check ${nota.estado === 'completada' ? 'checked' : ''}"></div>
-                <p class="tarea__info__nombre ${nota.estado === 'completada' ? 'tarea__info__nombre--checked' : ''}">${nota.titulo}</p>
-                <button class="tarea__borrar"><div class="tarea__borrar__icono"><img src="img/trash.svg" alt=""></div></button>
-            </div>
-            <div class="tarea__prioridad">
-                <p>Prioridad:</p> <p><span class="prioridad low"><img src="img/chevron-down.svg">Low</span> <span class="prioridad normal">Normal</span> <span class="prioridad high">High<img src="img/chevron-up.svg"></span></p> <p class="tarea__temporizador">Añadido hace 6 minutes ago</p>
-            </div>
-        </div>
-    `;
-
-    marcaChecks();
-    borrarTarea();
-    marcarPrioridad();
-    setInterval(actualizarTiempo, 1000);
 }
-
-mostrarNotas();
-actualizarTareasContador();
