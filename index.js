@@ -12,28 +12,22 @@ window.onload = () => {
     numTareas.textContent = Tarea.numTareas();
     numTareasPendientes.textContent = Tarea.numTareasPendientes();
     cargarTareas();
+    setInterval(actualizarMinutosTareas, 1000);
 }
 
 tareaInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         let tarea = new Tarea(tareaInput.value);
         tarea.guardar();
-        mostrarTarea(tarea);
+        mostrarTarea(tarea, true);
+        setInterval(actualizarMinutosTareas, 1000);
             
-
         actualizarNumTareas();
         actualizarTareasPendientes();
 
         tareaInput.value = '';
     }
 });
-
-function actualizarMinutosTareas() {
-    tareaContainer.querySelectorAll('.tarea').forEach(tareaElement => {
-        let titulo = tareaElement.querySelector('.tarea__info__nombre').textContent;
-        tareaElement.querySelector('.tarea__temporizador').textContent = `Añadido hace ${Tarea.getTiempo(titulo)} minutes ago`;
-    });
-}
 
 
 borrarTareas.addEventListener('click', () => {
@@ -46,6 +40,13 @@ borrarTareas.addEventListener('click', () => {
         }
     });
 });
+
+function actualizarMinutosTareas() {
+    tareaContainer.querySelectorAll('.tarea').forEach(tareaElement => {
+        let titulo = tareaElement.querySelector('.tarea__info__nombre').textContent;
+        tareaElement.querySelector('.tarea__temporizador').textContent = `Añadido hace ${Tarea.getTiempo(titulo)} minutes ago`;
+    });
+}
 
 function habilitarBorrado(tarea, tareaElement) {
     tareaElement.querySelector('.tarea__borrar').addEventListener('click', () => {
@@ -75,7 +76,7 @@ function actualizarTareasPendientes() {
     numTareasPendientes.textContent = Tarea.numTareasPendientes();
 }
 
-function mostrarTarea(tarea) {
+function mostrarTarea(tarea, nueva=false) {
     let tareaElement = document.createElement('div');
     tareaElement.classList.add('tarea');
     tareaElement.innerHTML = `
@@ -91,15 +92,16 @@ function mostrarTarea(tarea) {
 
     tareaContainer.appendChild(tareaElement);
 
+    if(nueva) {
+        $(tareaElement).hide().fadeIn(500);
+    }
+
     let prioridades = tareaElement.querySelectorAll('.prioridad');
     mostrarPrioridad(tarea, prioridades);
 
     habilitarBorrado(tarea, tareaElement);
     habilitarCambioEstado(tarea, tareaElement); 
     habilitarCambioPrioridad(tarea, prioridades);
-    setInterval(() => {
-        actualizarMinutosTareas();
-    }, 1000);
 }
 
 function mostrarPrioridad(tarea, prioridades) {
